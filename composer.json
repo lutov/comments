@@ -3,7 +3,9 @@
   "description": "",
   "license": "GPL-3.0+",
   "require": {
-    "php": ">=7.0"
+    "php": ">=7.0",
+    "ext-pdo": "*",
+    "ext-json": "*"
   },
   "autoload": {
     "files": ["config/database.php", "Comments.php"]
