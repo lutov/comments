@@ -1,0 +1,11 @@
+{
+  "name": "lutov/comments",
+  "description": "",
+  "license": "GPL-3.0+",
+  "require": {
+    "php": ">=7.0"
+  },
+  "autoload": {
+    "files": ["config/database.php", "Comment.php"]
+  }
+}
