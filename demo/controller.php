@@ -22,32 +22,56 @@ $result = array();
 
 $comments = new Comments($pdo);
 
+$action = (isset($request['action'])) ? strip_tags($request['action']) : '';
+
+$game_id = (isset($request['game_id'])) ? (int) $request['game_id'] : 0;
+
+$comment_id = (isset($request['comment_id'])) ? (int) $request['comment_id'] : 0;
+
 if(isset($request['user_id'])) {
 
 	$user_id = (int) $request['user_id'];
+	$result['comment']['user_id'] = $user_id;
 
 	if (isset($request['name'])) {
 		$name = strip_tags($request['name']);
 		$stmt = $pdo->prepare('UPDATE users SET name = :name WHERE id = :id');
 		$stmt->execute(array('id' => $user_id, 'name' => $name));
-		$result['name'] = $name;
+		$result['comment']['name'] = $name;
 	}
 
-	if (isset($request['game_id']) && isset($request['comment'])) {
-		$game_id = (int) $request['game_id'];
-		$text = strip_tags($request['comment']);
-		if(isset($request['comment_id'])) {
-			$comment_id = $request['comment_id'];
-			$stmt = $pdo->prepare('UPDATE comments SET comment = :comment WHERE id = :id');
-			$stmt->execute(array('id' => $comment_id, 'comment' => $text));
-		} else {
-			$stmt = $pdo->prepare('INSERT INTO comments SET comment = :comment, user_id = :user_id, game_id = :game_id');
-			$stmt->execute(array('user_id' => $user_id, 'comment' => $text, 'game_id' => $game_id));
-			$comment_id = $pdo->lastInsertId();
+	if (0 !== $game_id) {
+
+		if (isset($request['comment'])) {
+			$text = strip_tags($request['comment']);
+			if (0 !== $comment_id) {
+				$comments->update($comment_id, $text);
+			} else {
+				$comment_id = $comments->add($user_id, $game_id, $text);
+			}
+			$result['comment']['id'] = $comment_id;
+			$result['comment']['comment'] = $text;
 		}
-		$result['comment_id'] = $comment_id;
-		$result['comment'] = $text;
+
+		if ('get_user_comment' == $action) {
+
+			$result['comment'] = $comments->getUserCommentByGame($user_id, $game_id);
+
+		}
+
 	}
+
+	if ('delete_comment' == $action) {
+
+		$result['comment']['deleted'] = $comments->delete($user_id, $comment_id);
+
+	}
+
+}
+
+if ('get_comments' == $action) {
+
+	$result['comments'] = $comments->getRandomByGame($game_id);
 
 }
 
