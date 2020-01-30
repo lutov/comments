@@ -6,6 +6,6 @@
     "php": ">=7.0"
   },
   "autoload": {
-    "files": ["config/database.php", "Comment.php"]
+    "files": ["config/database.php", "Comments.php"]
   }
 }
